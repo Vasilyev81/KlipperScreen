@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import logging
+import math
 import os
 import pathlib
+import random
+import string
 import gi
 
 gi.require_version("Gtk", "3.0")
@@ -26,6 +29,15 @@ def format_label(widget, lines=2):
         label.set_line_wrap(True)
         label.set_ellipsize(Pango.EllipsizeMode.END)
         label.set_lines(lines)
+
+
+def draw_circle(area, context, color):
+    height = area.get_allocated_height()
+    area.set_size_request(height, height)
+    context.scale(1, 1)
+    context.arc(height * 0.45, height * 0.45, height * 0.4, 0, 2 * math.pi)
+    context.set_source_rgb(*color)
+    context.fill()
 
 
 class KlippyGtk:
@@ -188,6 +200,13 @@ class KlippyGtk:
         b.connect("clicked", self.screen.reset_screensaver_timeout)
         return b
 
+    def ColorButton(self, color=[0.0, 0.0, 0.0], label=None, style=None):
+        b = self.Button(None, label, style, Gtk.PositionType.RIGHT, 1)
+        da = Gtk.DrawingArea()
+        da.connect("draw", draw_circle, color)
+        b.set_image(da)
+        return b
+
     @staticmethod
     def Button_busy(widget, busy):
         spinner = find_widget(widget, Gtk.Spinner)
@@ -284,3 +303,4 @@ class KlippyGtk:
         if self.screen._config.get_main_config().getboolean("show_scroll_steppers", fallback=False) and steppers:
             scroll.get_vscrollbar().get_style_context().add_class("with-steppers")
         return scroll
+        

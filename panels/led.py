@@ -1,10 +1,10 @@
+from ks_includes.screen_panel import ScreenPanel
+from ks_includes.KlippyGcodes import KlippyGcodes
+from gi.repository import Gtk, GLib
 import logging
 import gi
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, GLib
-from ks_includes.KlippyGcodes import KlippyGcodes
-from ks_includes.screen_panel import ScreenPanel
 
 RGB = ["r", "g", "b"]
 RGBW = ["r", "g", "b", "w"]
@@ -46,7 +46,8 @@ class Panel(ScreenPanel):
 
     def back(self):
         if len(self.leds) > 1:
-            self.set_title(self._screen.panels[self._screen._cur_panels[-1]].title)
+            self.set_title(
+                self._screen.panels[self._screen._cur_panels[-1]].title)
             self.open_selector(led=None)
             return True
         return False
@@ -66,7 +67,8 @@ class Panel(ScreenPanel):
         grid = self._gtk.HomogeneousGrid()
         for i, led in enumerate(self.leds):
             name = led.split()[1] if len(led.split()) > 1 else led
-            button = self._gtk.Button(None, name.upper(), style=f"color{(i % 4) + 1}")
+            button = self._gtk.Button(
+                None, name.upper(), style=f"color{(i % 4) + 1}")
             button.connect("clicked", self.open_selector, led)
             grid.attach(button, (i % columns), int(i / columns), 1, 1)
         scroll = self._gtk.ScrolledWindow()
@@ -95,28 +97,40 @@ class Panel(ScreenPanel):
         else:
             self.presets = self.parse_presets(presets_data)
 
-        for idx, col_value in enumerate(color_data):
-            name = Gtk.Label()
-            name.set_markup(
-                f"\n<big><b>{(self.col_mix[idx]).upper()}</b></big>\n")
-            scale = Gtk.Scale.new_with_range(orientation=Gtk.Orientation.VERTICAL, min=0, max=255, step=1)
-            scale.set_inverted(True)
-            scale.set_value(round(col_value * 255))
-            scale.set_digits(0)
-            scale.set_vexpand(True)
-            scale.set_has_origin(True)
-            scale.get_style_context().add_class("fan_slider")
-            scale.connect("button-release-event", self.apply_scales)
-            self.scales[self.col_mix[idx]] = scale
-            scale_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=1)
-            scale_box.add(scale)
-            scale_box.add(name)
-            grid.attach(scale_box, idx, 0, 1, 1)
+        # for idx, col_value in enumerate(color_data):
+        #     name = Gtk.Label()
+        #     name.set_markup(
+        #         f"\n<big><b>{(self.col_mix[idx]).upper()}</b></big>\n")
+        #     scale = Gtk.Scale.new_with_range(orientation=Gtk.Orientation.VERTICAL, min=0, max=255, step=1)
+        #     scale.set_inverted(True)
+        #     scale.set_value(round(col_value * 255))
+        #     scale.set_digits(0)
+        #     scale.set_vexpand(True)
+        #     scale.set_has_origin(True)
+        #     scale.get_style_context().add_class("fan_slider")
+        #     scale.connect("button-release-event", self.apply_scales)
+        #     self.scales[self.col_mix[idx]] = scale
+        #     scale_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=1)
+        #     scale_box.add(scale)
+        #     scale_box.add(name)
+        #     grid.attach(scale_box, idx, 0, 1, 1)
 
         button_grid = self._gtk.HomogeneousGrid()
         for i, key in enumerate(self.presets):
-            button = self._gtk.Button(None, key.upper(), style=f"color{(i % 4) + 1}")
+            rgbx = list(self.presets[key][:])
+            if len(rgbx) == 4:
+                rgbx = self.rgbw_to_rgb(rgbx)
+            button = self._gtk.ColorButton(
+                rgbx, key.upper(), style=f"color{(i % 4) + 1}")
             button.connect("clicked", self.apply_preset, self.presets[key])
+            button.props.show_editor = False  # TODO:
+            # css = (f"label::after {{"
+            #        f"    content: '-|+';\n"
+            #        f"    font-size: 1em;\n"
+            #        f"    color: rgb({self.rgbw_to_rgb(self.presets[key], 255)}) ;\n"
+            #        f"}}")
+            # logging.info(css)
+            # self._gtk.apply_css(button, css)
             button_grid.attach(button, (i % 2), int(i / 2), 1, 1)
         grid.attach(button_grid, len(self.scales), 0, 2, 1)
         scroll = self._gtk.ScrolledWindow()
@@ -170,3 +184,13 @@ class Panel(ScreenPanel):
                 if color in preset
             ]
         return parsed
+
+    @staticmethod
+    def rgbw_to_rgb(rgbw, mult=1):
+        rgb = list(rgbw[:3])
+        w = rgbw[-1]
+        if w != 0:
+            k1 = w / 3
+            k2 = 1 + k1
+            return list(map(lambda x: (x + k1) / k2 * mult, rgb))
+        return rgb
