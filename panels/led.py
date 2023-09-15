@@ -121,7 +121,7 @@ class Panel(ScreenPanel):
             if len(rgbx) == 4:
                 rgbx = self.rgbw_to_rgb(rgbx)
             button = self._gtk.ColorButton(
-                rgbx, key.upper(), style=f"color{(i % 4) + 1}")
+                rgbx, key.upper(), "color3")
             button.connect("clicked", self.apply_preset, self.presets[key])
             button_grid.attach(button, (i % 2), int(i / 2), 1, 1)
         grid.attach(button_grid, len(self.scales), 0, 2, 1)
@@ -182,7 +182,6 @@ class Panel(ScreenPanel):
         rgb = list(rgbw[:3])
         w = rgbw[-1]
         if w != 0:
-            k1 = w / 2
-            k2 = 1 + k1
-            return list(map(lambda x: (x + k1) / k2, rgb))
+            k1 = 1 + w
+            return list(map(lambda x: (x + w) / k1, rgb))
         return rgb
