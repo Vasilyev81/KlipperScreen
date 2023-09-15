@@ -35,7 +35,7 @@ def draw_circle(area, context, color):
     height = area.get_allocated_height()
     area.set_size_request(height, height)
     context.scale(1, 1)
-    context.arc(height * 0.45, height * 0.45, height * 0.4, 0, 2 * math.pi)
+    context.arc(height * 0.5, height * 0.5, height * 0.4, 0, 2 * math.pi)
     context.set_source_rgb(*color)
     context.fill()
 
