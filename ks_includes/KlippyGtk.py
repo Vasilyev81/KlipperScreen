@@ -32,10 +32,10 @@ def format_label(widget, lines=2):
 
 
 def draw_circle(area, context, color):
-    height = area.get_allocated_height()
-    area.set_size_request(height, height)
+    side = area.get_allocated_height()
+    area.set_size_request(side, side)
     context.scale(1, 1)
-    context.arc(height * 0.5, height * 0.5, height * 0.4, 0, 2 * math.pi)
+    context.arc(side * 0.55, side * 0.6, side * 0.4, 0, 2 * math.pi)
     context.set_source_rgb(*color)
     context.fill()
 
