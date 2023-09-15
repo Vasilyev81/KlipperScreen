@@ -97,23 +97,23 @@ class Panel(ScreenPanel):
         else:
             self.presets = self.parse_presets(presets_data)
 
-        # for idx, col_value in enumerate(color_data):
-        #     name = Gtk.Label()
-        #     name.set_markup(
-        #         f"\n<big><b>{(self.col_mix[idx]).upper()}</b></big>\n")
-        #     scale = Gtk.Scale.new_with_range(orientation=Gtk.Orientation.VERTICAL, min=0, max=255, step=1)
-        #     scale.set_inverted(True)
-        #     scale.set_value(round(col_value * 255))
-        #     scale.set_digits(0)
-        #     scale.set_vexpand(True)
-        #     scale.set_has_origin(True)
-        #     scale.get_style_context().add_class("fan_slider")
-        #     scale.connect("button-release-event", self.apply_scales)
-        #     self.scales[self.col_mix[idx]] = scale
-        #     scale_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=1)
-        #     scale_box.add(scale)
-        #     scale_box.add(name)
-        #     grid.attach(scale_box, idx, 0, 1, 1)
+        for idx, col_value in enumerate(color_data):
+            name = Gtk.Label()
+            name.set_markup(
+                f"\n<big><b>{(self.col_mix[idx]).upper()}</b></big>\n")
+            scale = Gtk.Scale.new_with_range(orientation=Gtk.Orientation.VERTICAL, min=0, max=255, step=1)
+            scale.set_inverted(True)
+            scale.set_value(round(col_value * 255))
+            scale.set_digits(0)
+            scale.set_vexpand(True)
+            scale.set_has_origin(True)
+            scale.get_style_context().add_class("fan_slider")
+            scale.connect("button-release-event", self.apply_scales)
+            self.scales[self.col_mix[idx]] = scale
+            scale_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=1)
+            scale_box.add(scale)
+            scale_box.add(name)
+            grid.attach(scale_box, idx, 0, 1, 1)
 
         button_grid = self._gtk.HomogeneousGrid()
         for i, key in enumerate(self.presets):
@@ -123,14 +123,6 @@ class Panel(ScreenPanel):
             button = self._gtk.ColorButton(
                 rgbx, key.upper(), style=f"color{(i % 4) + 1}")
             button.connect("clicked", self.apply_preset, self.presets[key])
-            button.props.show_editor = False  # TODO:
-            # css = (f"label::after {{"
-            #        f"    content: '-|+';\n"
-            #        f"    font-size: 1em;\n"
-            #        f"    color: rgb({self.rgbw_to_rgb(self.presets[key], 255)}) ;\n"
-            #        f"}}")
-            # logging.info(css)
-            # self._gtk.apply_css(button, css)
             button_grid.attach(button, (i % 2), int(i / 2), 1, 1)
         grid.attach(button_grid, len(self.scales), 0, 2, 1)
         scroll = self._gtk.ScrolledWindow()
