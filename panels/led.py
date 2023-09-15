@@ -178,11 +178,11 @@ class Panel(ScreenPanel):
         return parsed
 
     @staticmethod
-    def rgbw_to_rgb(rgbw, mult=1):
+    def rgbw_to_rgb(rgbw):
         rgb = list(rgbw[:3])
         w = rgbw[-1]
         if w != 0:
-            k1 = w / 3
+            k1 = w / 2
             k2 = 1 + k1
-            return list(map(lambda x: (x + k1) / k2 * mult, rgb))
+            return list(map(lambda x: (x + k1) / k2, rgb))
         return rgb
