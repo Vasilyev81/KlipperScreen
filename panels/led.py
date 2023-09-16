@@ -1,10 +1,13 @@
 from ks_includes.screen_panel import ScreenPanel
 from ks_includes.KlippyGcodes import KlippyGcodes
-from gi.repository import Gtk, GLib
 import logging
 import gi
+from math import pi
 
 gi.require_version("Gtk", "3.0")
+from gi.repository import Gtk, GLib
+
+
 
 colors = "RGBW"
 
@@ -93,7 +96,7 @@ class Panel(ScreenPanel):
         for idx, col_value in enumerate(self.color_data):
             if not self.color_available(idx):
                 continue
-            button = self._gtk.Button(label=f'{colors[idx].upper()}', style=f"color{idx + 1}")
+            button = self._gtk.Button(label=f'{colors[idx].upper()}', style="color3")
             color = [0, 0, 0, 0]
             color[idx] = 1
             button.connect("clicked", self.apply_preset, color)
