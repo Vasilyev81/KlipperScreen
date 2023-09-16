@@ -30,7 +30,6 @@ class Panel(ScreenPanel):
         self.current_led = self.leds[0] if len(self.leds) == 1 else None
         self.open_selector(None, self.current_led)
 
-
     def color_available(self, idx):
         return (
             (idx == 0 and 'R' in self.color_order)
