@@ -1,12 +1,11 @@
 from ks_includes.screen_panel import ScreenPanel
 from ks_includes.KlippyGcodes import KlippyGcodes
 import logging
-import gi
 from math import pi
+import gi
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib
-
 
 
 colors = "RGBW"
@@ -49,9 +48,8 @@ class Panel(ScreenPanel):
         self._screen.base_panel.set_title(self.prettify(title))
 
     def back(self):
-        if len(self.leds) > 1:
-            self.set_title(
-                self._screen.panels[self._screen._cur_panels[-1]].title)
+        if len(self.leds) > 1 and self.current_led:
+            self.set_title(self._screen.panels[self._screen._cur_panels[-1]].title)
             self.open_selector(led=None)
             return True
         return False
@@ -71,8 +69,7 @@ class Panel(ScreenPanel):
         grid = self._gtk.HomogeneousGrid()
         for i, led in enumerate(self.leds):
             name = led.split()[1] if len(led.split()) > 1 else led
-            button = self._gtk.Button(
-                None, name.upper(), style=f"color{(i % 4) + 1}")
+            button = self._gtk.Button(None, name.upper(), style=f"color{(i % 4) + 1}")
             button.connect("clicked", self.open_selector, led)
             grid.attach(button, (i % columns), int(i / columns), 1, 1)
         scroll = self._gtk.ScrolledWindow()
@@ -124,8 +121,7 @@ class Panel(ScreenPanel):
             rgbx = list(self.presets[key][:])
             if len(rgbx) == 4:
                 rgbx = self.rgbw_to_rgb(rgbx)
-            button = self._gtk.ColorButton(
-                rgbx, key.upper(), "color3")
+            button = self._gtk.ColorButton(rgbx, key.upper(), "color3")
             button.connect("clicked", self.apply_preset, self.presets[key])
             preset_list.add(button)
         self.preview.queue_draw()

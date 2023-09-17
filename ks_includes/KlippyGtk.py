@@ -3,8 +3,6 @@ import logging
 import math
 import os
 import pathlib
-import random
-import string
 import gi
 
 gi.require_version("Gtk", "3.0")
@@ -303,4 +301,3 @@ class KlippyGtk:
         if self.screen._config.get_main_config().getboolean("show_scroll_steppers", fallback=False) and steppers:
             scroll.get_vscrollbar().get_style_context().add_class("with-steppers")
         return scroll
-        
