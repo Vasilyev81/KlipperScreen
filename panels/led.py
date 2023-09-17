@@ -1,11 +1,12 @@
+from ks_includes.screen_panel import ScreenPanel
+from ks_includes.KlippyGcodes import KlippyGcodes
 import logging
+from math import pi
 import gi
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib
-from math import pi
-from ks_includes.KlippyGcodes import KlippyGcodes
-from ks_includes.screen_panel import ScreenPanel
+
 
 colors = "RGBW"
 
@@ -47,7 +48,7 @@ class Panel(ScreenPanel):
         self._screen.base_panel.set_title(self.prettify(title))
 
     def back(self):
-        if len(self.leds) > 1:
+        if len(self.leds) > 1 and self.current_led:
             self.set_title(self._screen.panels[self._screen._cur_panels[-1]].title)
             self.open_selector(led=None)
             return True
@@ -92,7 +93,8 @@ class Panel(ScreenPanel):
         for idx, col_value in enumerate(self.color_data):
             if not self.color_available(idx):
                 continue
-            button = self._gtk.Button(label=f'{colors[idx].upper()}', style=f"color{idx + 1}")
+            button = self._gtk.Button(label=f'{colors[idx].upper()}', style="color3")
+
             color = [0, 0, 0, 0]
             color[idx] = 1
             button.connect("clicked", self.apply_preset, color)
@@ -117,7 +119,10 @@ class Panel(ScreenPanel):
         preset_list = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=1)
         preset_list.add(preview_box)
         for i, key in enumerate(self.presets):
-            button = self._gtk.Button(None, key.upper(), style=f"color{(i % 4) + 1}")
+            rgbx = list(self.presets[key][:])
+            if len(rgbx) == 4:
+                rgbx = self.rgbw_to_rgb(rgbx)
+            button = self._gtk.ColorButton(rgbx, key.upper(), "color3")
             button.connect("clicked", self.apply_preset, self.presets[key])
             preset_list.add(button)
         self.preview.queue_draw()
@@ -179,3 +184,12 @@ class Panel(ScreenPanel):
                 if color in preset and preset[color] is not None
             ]
         return parsed
+
+    @staticmethod
+    def rgbw_to_rgb(rgbw):
+        rgb = list(rgbw[:3])
+        w = rgbw[-1]
+        if w != 0:
+            k1 = 1 + w
+            return list(map(lambda x: (x + w) / k1, rgb))
+        return rgb

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+import math
 import os
 import pathlib
 import gi
@@ -26,6 +27,15 @@ def format_label(widget, lines=2):
         label.set_line_wrap(True)
         label.set_ellipsize(Pango.EllipsizeMode.END)
         label.set_lines(lines)
+
+
+def draw_circle(area, context, color):
+    side = area.get_allocated_height()
+    area.set_size_request(side, side)
+    context.scale(1, 1)
+    context.arc(side * 0.55, side * 0.6, side * 0.4, 0, 2 * math.pi)
+    context.set_source_rgb(*color)
+    context.fill()
 
 
 class KlippyGtk:
@@ -186,6 +196,13 @@ class KlippyGtk:
         if style is not None:
             b.get_style_context().add_class(style)
         b.connect("clicked", self.screen.reset_screensaver_timeout)
+        return b
+
+    def ColorButton(self, color=[0.0, 0.0, 0.0], label=None, style=None):
+        b = self.Button(None, label, style, Gtk.PositionType.RIGHT, 1)
+        da = Gtk.DrawingArea()
+        da.connect("draw", draw_circle, color)
+        b.set_image(da)
         return b
 
     @staticmethod
