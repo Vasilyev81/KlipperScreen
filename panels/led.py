@@ -161,7 +161,7 @@ class Panel(ScreenPanel):
             self.color_data[idx] = round(self.scales[idx].get_value() / 255, 4)
 
     def apply_preset(self, widget, color_data):
-        if color_data == list(map(lambda s: s.get_value(), self.scales)):
+        if color_data == self.color_data:
             color_data = [0.0] * 4
         self.update_scales(color_data)
         self.apply_scales()
