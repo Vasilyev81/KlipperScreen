@@ -94,6 +94,7 @@ class Panel(ScreenPanel):
             if not self.color_available(idx):
                 continue
             button = self._gtk.Button(label=f'{colors[idx].upper()}', style="color3")
+
             color = [0, 0, 0, 0]
             color[idx] = 1
             button.connect("clicked", self.apply_preset, color)
